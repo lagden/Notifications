@@ -1,0 +1,6 @@
+{
+    "volo": {
+        "url": "https://raw.githubusercontent.com/lagden/Notifications/{version}/theNotification.js"
+    },
+    "main": "theNotification.js"
+}
