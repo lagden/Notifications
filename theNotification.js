@@ -10,7 +10,9 @@
  * @depends:
  *   TweenMax - https://raw.githubusercontent.com/greensock/GreenSock-JS/blob/{version}/src/uncompressed/TweenMax.js
  */
-;(function(window) {
+;(function(window, document) {
+
+    'use strict';
 
     var options = {
         duration: 5000,
@@ -21,6 +23,9 @@
     var handlerRemove;
 
     function TheNotification(opts) {
+        if (false === (this instanceof TheNotification)) {
+            return new TheNotification(opts);
+        }
         this.opts = extend({}, options, opts);
         this.items = [];
         this.container = this.opts.container || document.body;
@@ -120,4 +125,4 @@
     else
         window.TheNotification = TheNotification;
 
-}(window));
+}(window, document));
