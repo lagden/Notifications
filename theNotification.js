@@ -9,15 +9,18 @@
  *   TweenMax - https://raw.githubusercontent.com/greensock/GreenSock-JS/blob/{version}/src/uncompressed/TweenMax.js
  */
 
+// http://forums.greensock.com/topic/7145-using-with-requirejs/#entry26768
+// window.GreenSockAMDPath = 'greensock';
+
 (function(root, factory) {
     if (typeof define === 'function' && define.amd) {
-        define(['tweenmax'], function(b) {
-            return (root.amdWebGlobal = factory(b));
+        define(['greensock/TweenMax'], function(TM) {
+            return (root.amdWebGlobal = factory(TM));
         });
     } else {
-        root.amdWebGlobal = factory(root.b);
+        root.amdWebGlobal = factory(root.TM);
     }
-}(this, function(b) {
+}(this, function(TM) {
 
     'use strict';
 
@@ -44,7 +47,7 @@
         var content = this.template.replace(/\{title\}/g, t);
         content = content.replace(/\{msg\}/g, m);
 
-        var item = document.createElement("div");
+        var item = document.createElement('div');
         item.className = 'theNotification';
         item.style.opacity = 0;
         item.insertAdjacentHTML('afterbegin', content);
@@ -76,7 +79,7 @@
     TheNotification.prototype.render = function(item, offset) {
         var that = this;
         this.container.appendChild(item);
-        TweenMax.fromTo(item, .5, {
+        TM.fromTo(item, .5, {
             top: offset[0],
             opacity: 0
         }, {
@@ -96,7 +99,7 @@
         item.removeEventListener('click', handlerRemove, false);
         if (index == -1) return this;
         this.items.splice(index, 1);
-        TweenMax.to(item, .3, {
+        TM.to(item, .3, {
             top: '-=30px',
             opacity: 0,
             onComplete: function() {
