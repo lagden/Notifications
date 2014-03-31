@@ -3,14 +3,21 @@
  *
  * It is a plugin that show notification like Growl
  *
- * @version     0.1.0
- *
  * @author      Thiago Lagden <lagden [at] gmail.com>
  * @copyright   Author
  * @depends:
  *   TweenMax - https://raw.githubusercontent.com/greensock/GreenSock-JS/blob/{version}/src/uncompressed/TweenMax.js
  */
-;(function(window, document) {
+
+(function(root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        define(['tweenmax'], function(b) {
+            return (root.amdWebGlobal = factory(b));
+        });
+    } else {
+        root.amdWebGlobal = factory(root.b);
+    }
+}(this, function(b) {
 
     'use strict';
 
@@ -117,12 +124,5 @@
         return out;
     }
 
-    // AMD Support
-    if (typeof define === 'function' && define.amd)
-        define(['tweenmax'], function() {
-            return TheNotification;
-        });
-    else
-        window.TheNotification = TheNotification;
-
-}(window, document));
+    return TheNotification;
+}));
