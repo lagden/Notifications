@@ -75,88 +75,87 @@ It is a plugin that show notification like Growl
       return;
     }
 
+    TheNotification.prototype.notifica = function(t, m) {
+      var content, item, last, offset, r;
+      r = {
+        title: t,
+        msg: m
+      };
+      content = this.template.replace(/\{(.*?)\}/g, function(a, b) {
+        return r[b];
+      });
+      item = document.createElement('div');
+      item.className = 'theNotification';
+      item.style.opacity = 0;
+      item.insertAdjacentHTML('afterbegin', content);
+      offset = [0, this.opts.offset];
+      last = this.items[this.items.length - 1];
+      if (last) {
+        offset[0] = parseInt(last.getAttribute('data-offset'), 10);
+        offset[1] = parseInt(offset[0] + last.offsetHeight + this.opts.offset, 10);
+      }
+      item.setAttribute('data-offset', offset[1]);
+      item.addEventListener('click', handlerRemove.bind(this, item), false);
+      this.items.push(item);
+      this.render(item, offset);
+    };
+
+    TheNotification.prototype.render = function(item, offset) {
+      var from, to;
+      this.container.appendChild(item);
+      item.style.top = offset[0];
+      item.style.opacity = 0;
+      from = offset[0];
+      to = offset[1];
+      animate({
+        duration: 500,
+        delta: function(p) {
+          return 1 - Math.sin(Math.acos(p));
+        },
+        step: function(d) {
+          var t;
+          t = parseInt((d * (to - from)) + from, 10);
+          item.style.top = t + 'px';
+          item.style.opacity = d;
+        },
+        complete: (function() {
+          setTimeout((function() {
+            this.remove(item);
+          }).bind(this), this.opts.duration);
+        }).bind(this)
+      });
+    };
+
+    TheNotification.prototype.remove = function(item) {
+      var from, index, to;
+      index = this.items.indexOf(item);
+      item.removeEventListener('click', handlerRemove);
+      if (index === -1) {
+        return this;
+      }
+      this.items.splice(index, 1);
+      from = parseInt(item.style.top, 10);
+      to = from - 30;
+      animate({
+        duration: 300,
+        delta: function(p) {
+          return 1 - Math.sin(Math.acos(p));
+        },
+        step: function(d) {
+          var o, t;
+          t = parseInt((d * (to - from)) + from, 10);
+          o = (d * (0 - 1)) + 1;
+          item.style.top = t + 'px';
+          item.style.opacity = o;
+        },
+        complete: (function() {
+          this.container.removeChild(item);
+        }).bind(this)
+      });
+    };
+
     return TheNotification;
 
   })();
-  TheNotification.prototype.notifica = function(t, m) {
-    var content, item, last, offset, r, that;
-    that = this;
-    r = {
-      title: t,
-      msg: m
-    };
-    content = this.template.replace(/\{(.*?)\}/g, function(a, b) {
-      return r[b];
-    });
-    item = document.createElement('div');
-    item.className = 'theNotification';
-    item.style.opacity = 0;
-    item.insertAdjacentHTML('afterbegin', content);
-    offset = [0, this.opts.offset];
-    last = this.items[this.items.length - 1];
-    if (last) {
-      offset[0] = parseInt(last.getAttribute('data-offset'), 10);
-      offset[1] = parseInt(offset[0] + last.offsetHeight + this.opts.offset, 10);
-    }
-    item.setAttribute('data-offset', offset[1]);
-    item.addEventListener('click', handlerRemove.bind(this, item), false);
-    this.items.push(item);
-    this.render(item, offset);
-  };
-  TheNotification.prototype.render = function(item, offset) {
-    var from, rm, that, to;
-    that = this;
-    this.container.appendChild(item);
-    item.style.top = offset[0];
-    item.style.opacity = 0;
-    rm = function() {
-      setTimeout((function() {
-        that.remove(item);
-      }), that.opts.duration);
-    };
-    from = offset[0];
-    to = offset[1];
-    animate({
-      duration: 500,
-      delta: function(p) {
-        return 1 - Math.sin(Math.acos(p));
-      },
-      step: function(d) {
-        var t;
-        t = parseInt((d * (to - from)) + from, 10);
-        item.style.top = t + 'px';
-        item.style.opacity = d;
-      },
-      complete: rm
-    });
-  };
-  TheNotification.prototype.remove = function(item) {
-    var from, index, that, to;
-    that = this;
-    index = this.items.indexOf(item);
-    item.removeEventListener('click', handlerRemove);
-    if (index === -1) {
-      return this;
-    }
-    this.items.splice(index, 1);
-    from = parseInt(item.style.top, 10);
-    to = from - 30;
-    animate({
-      duration: 300,
-      delta: function(p) {
-        return 1 - Math.sin(Math.acos(p));
-      },
-      step: function(d) {
-        var o, t;
-        t = parseInt((d * (to - from)) + from, 10);
-        o = (d * (0 - 1)) + 1;
-        item.style.top = t + 'px';
-        item.style.opacity = o;
-      },
-      complete: function() {
-        that.container.removeChild(item);
-      }
-    });
-  };
   return TheNotification;
 });

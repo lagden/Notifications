@@ -69,19 +69,19 @@ It is a plugin that show notification like Growl
       @template = @opts.template or getTemplate()
       return
 
-    notifica = (t, m) ->
+    notifica: (t, m) ->
       r = {
         title: t
         msg: m
       }
       content = @template.replace /\{(.*?)\}/g, (a, b) ->
         return r[b]
-  
+
       item = document.createElement 'div'
       item.className = 'theNotification'
       item.style.opacity = 0
       item.insertAdjacentHTML 'afterbegin', content
-  
+
       offset = [
         0
         @opts.offset
@@ -90,23 +90,23 @@ It is a plugin that show notification like Growl
       if last
         offset[0] = parseInt last.getAttribute('data-offset'), 10
         offset[1] = parseInt (offset[0] + last.offsetHeight + @opts.offset), 10
-  
+
       item.setAttribute 'data-offset', offset[1]
       item.addEventListener 'click', handlerRemove.bind(@, item), false
-  
-      @opts.push item
+
+      @items.push item
       @render item, offset
       return
 
-    render = (item, offset) ->
+    render: (item, offset) ->
       @container.appendChild item
-      
+
       item.style.top = offset[0]
       item.style.opacity = 0
-      
+
       from = offset[0]
       to = offset[1]
-  
+
       animate {
         duration: 500
         delta: (p) ->
@@ -126,7 +126,7 @@ It is a plugin that show notification like Growl
       }
       return
 
-    remove = (item) ->
+    remove: (item) ->
       index = @items.indexOf item
       item.removeEventListener 'click', handlerRemove
       return @ if index is -1
@@ -144,7 +144,7 @@ It is a plugin that show notification like Growl
           item.style.opacity = o
           return
         complete: (->
-          that.container.removeChild item
+          @container.removeChild item
           return
         ).bind @
       }
