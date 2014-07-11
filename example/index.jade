@@ -1,0 +1,19 @@
+doctype
+html(lang="en")
+    head
+        meta(charset='utf8')
+        meta(http-equiv='X-UA-Compatible', content='IE=edge, chrome=1')
+        meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
+        meta(name='description', content='Example')
+        meta(name='author', content= 'Thiago Lagden')
+        link(rel='stylesheet', type='text/css', href='../dist/theNotification.css')
+    title Example
+    body
+        h1 Example
+        button#call Notifica
+        script(src="../dist/theNotification.js")
+        script.
+            var n = new TheNotification({duration: 5000});
+            document.querySelector('#call').addEventListener('click', function(){
+                n.notifica('Awesome', 'Vanilla JS is nice!!');
+            }, false);

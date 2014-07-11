@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Example">
+    <meta name="author" content="Thiago Lagden">
+    <link rel="stylesheet" type="text/css" href="../dist/theNotification.css">
+  </head>
+  <title>Example</title>
+  <body>
+    <h1>Example</h1>
+    <button id="call">Notifica</button>
+    <script src="../dist/theNotification.js"></script>
+    <script>
+      var n = new TheNotification({duration: 5000});
+      document.querySelector('#call').addEventListener('click', function(){
+          n.notifica('Awesome', 'Vanilla JS is nice!!');
+      }, false);
+    </script>
+  </body>
+</html>

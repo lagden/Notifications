@@ -1,11 +1,7 @@
-@import compass/css3/border-radius
-@import compass/css3/box-shadow
-@import compass/css3/box-sizing
-
 .theNotification
-    +border-radius(5px)
-    +box-shadow(0 0 5px rgba(gray, 0.5))
-    +box-sizing(border-box)
+    border-radius: 5px
+    box-shadow: 0 0 5px rgba(gray, 0.5)
+    box-sizing: border-box
     width: 300px
     padding: 10px
     background-color: rgba(blue, 0.8)
@@ -15,6 +11,8 @@
     right: 10px
     bottom: auto
     left: auto
+    user-select: none
+    // transition: opacity 0.08s ease, transform 0.08s linear
 
 .theNotification__title
     font-size: 1.1em
