@@ -2,16 +2,22 @@ theNotification.js - Notifications
 ==================================
  
 It is a plugin that show notification like Growl
-    
-### Depends
-
- - [TweenMax](https://raw.githubusercontent.com/greensock/GreenSock-JS/master/src/uncompressed/TweenMax.js)
 
 ### Usage
 
+**RequireJS**
+
+```javascript
+var growl = require('theNotification')();
+
+for(var i=-1; ++i < 10;)
+    growl.notifica('Count...', i);
+```
+
+**Global**
+
 ```javascript
 
-var TheNotification = require('theNotification');
 var growl = new TheNotification();
 
 for(var i=-1; ++i < 10;)
@@ -21,4 +27,4 @@ for(var i=-1; ++i < 10;)
 
 ### Author
 
-[Thiago Lagden](mailto:lagden@gmail.com)
+[Thiago Lagden](http://lagden.in)
