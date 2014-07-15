@@ -6,13 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="Example">
     <meta name="author" content="Thiago Lagden">
-    <link rel="stylesheet" type="text/css" href="../dist/theNotification.css">
+    <link rel="stylesheet" type="text/css" href="the-notification.css">
   </head>
   <title>Example</title>
   <body>
     <h1>Example</h1>
     <button id="call">Notifica</button>
-    <script src="../dist/theNotification.js"></script>
+    <script src="lib/get-style-property/get-style-property.js"></script>
+    <script src="the-notification.js"></script>
     <script>
       var n = new TheNotification({duration: 5000});
       document.querySelector('#call').addEventListener('click', function(){

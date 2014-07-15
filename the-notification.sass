@@ -1,0 +1,51 @@
+.theNotification
+    border-radius: 5px
+    box-shadow: 0 0 5px rgba(gray, 0.5)
+    box-sizing: border-box
+    width: 300px
+    padding: 10px
+    background-color: rgba(blue, 0.8)
+    position: fixed
+    z-index: 999
+    top: 0
+    right: 10px
+    bottom: auto
+    left: auto
+    user-select: none
+    // transition: opacity 0.08s ease, transform 0.08s linear
+
+.theNotification__title
+    font-size: 1.1em
+    margin: 0 0 10px 0
+    color: white
+
+.theNotification__msg
+    font-size: 0.9em
+    margin: 0
+    color: white
+
+// .theNotification--show
+//     animation: show-notification 0.4s ease
+
+// .theNotification--hide
+//     animation: hide-notification 0.4s ease
+
+// =keyframes($name)
+//     @keyframes #{$name}
+//         @content
+
+// +keyframes(show-notification)
+//     from
+//         transform: translateY(0)
+//         opacity: 0
+//     to
+//         transform: translateY(calc(100% + 10px))
+//         opacity: 1
+
+// +keyframes(hide-notification)
+//     from
+//         transform: translateY(100%)
+//         opacity: 1
+//     to
+//         transform: translateY(0)
+//         opacity: 0

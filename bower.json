@@ -1,0 +1,21 @@
+{
+    "name": "the-notification",
+    "version": "0.0.1",
+    "main": [
+        "./dist/the-notification.js",
+        "./dist/the-notification.css"
+    ],
+    "dependencies": {
+        "get-style-property": "desandro/get-style-property#~1.0.3"
+    },
+    "ignore": [
+        "dist/",
+        "examples/",
+        "*.js",
+        "*.coffee",
+        "*.json",
+        "*.md",
+        "*.sass",
+        "**/.*"
+    ]
+}

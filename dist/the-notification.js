@@ -9,13 +9,13 @@ It is a plugin that show notification like Growl
  */
 (function(root, factory) {
   if (typeof define === "function" && define.amd) {
-    define(factory);
+    define(['getStyleProperty'], factory);
   } else {
-    root.TheNotification = factory();
+    root.TheNotification = factory(root.getStyleProperty);
   }
-})(this, function() {
+})(this, function(getStyleProperty) {
   'use strict';
-  var TheNotification, animate, extend, getTemplate, handlerRemove, options;
+  var TheNotification, animate, extend, getTemplate, handlerRemove, options, transformProp;
   getTemplate = function() {
     return ['<h3 class="theNotification__title">{title}</h3>', '<p class="theNotification__msg">{msg}</p>'].join('');
   };
@@ -63,6 +63,7 @@ It is a plugin that show notification like Growl
     container: null,
     offset: 10
   };
+  transformProp = getStyleProperty('transform');
   TheNotification = (function() {
     function TheNotification(opts) {
       if (false === (this instanceof TheNotification)) {
@@ -103,7 +104,7 @@ It is a plugin that show notification like Growl
     TheNotification.prototype.render = function(item, offset) {
       var from, to;
       this.container.appendChild(item);
-      item.style.top = offset[0];
+      item.style[transformProp] = 'translate3d(0,' + offset[0] + 'px,0)';
       item.style.opacity = 0;
       from = offset[0];
       to = offset[1];
@@ -115,7 +116,7 @@ It is a plugin that show notification like Growl
         step: function(d) {
           var t;
           t = parseInt((d * (to - from)) + from, 10);
-          item.style.top = t + 'px';
+          item.style[transformProp] = 'translate3d(0,' + t + 'px,0)';
           item.style.opacity = d;
         },
         complete: (function() {
@@ -134,7 +135,7 @@ It is a plugin that show notification like Growl
         return this;
       }
       this.items.splice(index, 1);
-      from = parseInt(item.style.top, 10);
+      from = parseInt(item.style[transformProp].replace(/translate3d\(0px, ([\-0-9]+)px, 0px\)/gi, '$1'), 10);
       to = from - 30;
       animate({
         duration: 300,
@@ -145,7 +146,7 @@ It is a plugin that show notification like Growl
           var o, t;
           t = parseInt((d * (to - from)) + from, 10);
           o = (d * (0 - 1)) + 1;
-          item.style.top = t + 'px';
+          item.style[transformProp] = 'translate3d(0,' + t + 'px,0)';
           item.style.opacity = o;
         },
         complete: (function() {

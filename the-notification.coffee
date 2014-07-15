@@ -9,11 +9,11 @@ It is a plugin that show notification like Growl
 
 ((root, factory) ->
   if typeof define is "function" and define.amd
-    define factory
+    define ['getStyleProperty'], factory
   else
-    root.TheNotification = factory()
+    root.TheNotification = factory(root.getStyleProperty)
   return
-) @, () ->
+) @, (getStyleProperty) ->
 
   'use strict'
 
@@ -60,6 +60,8 @@ It is a plugin that show notification like Growl
       offset: 10
   }
 
+  transformProp = getStyleProperty 'transform'
+
   class TheNotification
     constructor: (opts) ->
       return new TheNotification(opts) if false is (@ instanceof TheNotification)
@@ -101,7 +103,7 @@ It is a plugin that show notification like Growl
     render: (item, offset) ->
       @container.appendChild item
 
-      item.style.top = offset[0]
+      item.style[transformProp] = 'translate3d(0,' + offset[0] + 'px,0)'
       item.style.opacity = 0
 
       from = offset[0]
@@ -113,7 +115,7 @@ It is a plugin that show notification like Growl
           return 1 - Math.sin Math.acos p
         step: (d) ->
           t = parseInt((d * (to-from)) + from, 10)
-          item.style.top = t + 'px'
+          item.style[transformProp] = 'translate3d(0,' + t + 'px,0)'
           item.style.opacity = d
           return
         complete: (->
@@ -131,7 +133,7 @@ It is a plugin that show notification like Growl
       item.removeEventListener 'click', handlerRemove
       return @ if index is -1
       @items.splice index, 1
-      from = parseInt item.style.top, 10
+      from = parseInt item.style[transformProp].replace(/translate3d\(0px, ([\-0-9]+)px, 0px\)/gi, '$1'), 10
       to = from - 30
       animate {
         duration: 300
@@ -140,7 +142,7 @@ It is a plugin that show notification like Growl
         step: (d) ->
           t = parseInt((d * (to-from)) + from, 10)
           o = (d * (0-1)) + 1;
-          item.style.top = t + 'px'
+          item.style[transformProp] = 'translate3d(0,' + t + 'px,0)'
           item.style.opacity = o
           return
         complete: (->
