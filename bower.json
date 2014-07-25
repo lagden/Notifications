@@ -1,6 +1,6 @@
 {
-    "name": "the-notification",
-    "title": "Notification",
+    "name": "notifications",
+    "title": "Notifications",
     "description": "It is a plugin that show notification like Growl",
     "version": "0.0.1",
     "author": "Thiago Lagden",
