@@ -27,8 +27,11 @@ AUTOPREFIXER_BROWSERS = [
 gulp.task 'css', ->
   gulp.src '*.sass'
     .pipe sass {
-      sourcemap: true
-      sourcemapPath: './'
+      trace         : true
+      sourcemap     : true
+      sourcemapPath : './'
+      style         : 'compressed'
+      noCache       : true
     }
     .pipe prefix AUTOPREFIXER_BROWSERS
     .pipe gulp.dest 'dist/'
