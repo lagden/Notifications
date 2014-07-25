@@ -1,20 +1,40 @@
 {
-  "volo": {
-    "url": "https://raw.githubusercontent.com/lagden/Notifications/{version}/dist/theNotification.js",
-    "dependencies": {
-      "getStyleProperty": "https://raw.githubusercontent.com/desandro/get-style-property/v1.0.3/get-style-property.js"
+    "name": "the-notification",
+    "title": "Notification",
+    "description": "It is a plugin that show notification like Growl",
+    "version": "0.0.1",
+    "author": {
+        "name": "Thiago Lagden",
+        "email": "lagden@gmail.com",
+        "url": "http://lagden.in"
+    },
+    "keyword": [
+        "notification",
+        "growl",
+        "plugin"
+    ],
+    "main": "./dist/the-notification.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/lagden/Notifications"
+    },
+    "engines": {
+        "node": ">=0.8.0"
+    },
+    "download": "https://github.com/lagden/Notifications/releases",
+    "devDependencies": {
+        "browser-sync": "^1.2.1",
+        "coffee-script": "^1.7.1",
+        "gulp": "^3.8.6",
+        "gulp-autoprefixer": "0.0.8",
+        "gulp-coffee": "^2.1.0",
+        "gulp-filter": "^0.5.0",
+        "gulp-jade": "^0.6.1",
+        "gulp-ruby-sass": "^0.6.0",
+        "gulp-uglifyjs": "^0.4.2",
+        "gulp-util": "^2.2.20"
+    },
+    "volo": {
+        "url": "https://raw.githubusercontent.com/lagden/Notifications/{version}/dist/theNotification.js"
     }
-  },
-  "main": "./dist/theNotification.js",
-  "devDependencies": {
-    "browser-sync": "~1.2.1",
-    "coffee-script": "~1.7.1",
-    "gulp": "~3.8.6",
-    "gulp-autoprefixer": "0.0.8",
-    "gulp-coffee": "~2.1.0",
-    "gulp-filter": "~0.5.0",
-    "gulp-jade": "~0.6.1",
-    "gulp-ruby-sass": "~0.6.0",
-    "gulp-util": "~2.2.20"
-  }
 }

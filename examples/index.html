@@ -8,16 +8,16 @@
     <meta name="author" content="Thiago Lagden">
     <link rel="stylesheet" type="text/css" href="the-notification.css">
   </head>
-  <title>Example</title>
+  <title>Exemplo</title>
   <body>
-    <h1>Example</h1>
+    <h1>Exemplo</h1>
     <button id="call">Notifica</button>
-    <script src="lib/get-style-property/get-style-property.js"></script>
+    <script src="lib/gsap/src/uncompressed/TweenMax.js"></script>
     <script src="the-notification.js"></script>
     <script>
       var n = new TheNotification({duration: 5000});
       document.querySelector('#call').addEventListener('click', function(){
-          n.notifica('Hey!', 'Coffee + Vanilla is great!!');
+          n.notifica('Hey!', 'Coffee with vanilla is nice!!');
       }, false);
     </script>
   </body>

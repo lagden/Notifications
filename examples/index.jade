@@ -7,15 +7,15 @@ html(lang="en")
         meta(name='description', content='Example')
         meta(name='author', content= 'Thiago Lagden')
         link(rel='stylesheet', type='text/css', href='the-notification.css')
-    title Example
+    title Exemplo
     body
-        h1 Example
+        h1 Exemplo
         button#call Notifica
 
-        script(src="lib/get-style-property/get-style-property.js")
+        script(src="lib/gsap/src/uncompressed/TweenMax.js")
         script(src="the-notification.js")
         script.
             var n = new TheNotification({duration: 5000});
             document.querySelector('#call').addEventListener('click', function(){
-                n.notifica('Hey!', 'Coffee + Vanilla is great!!');
+                n.notifica('Hey!', 'Coffee with vanilla is nice!!');
             }, false);

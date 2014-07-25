@@ -1,21 +1,29 @@
 {
     "name": "the-notification",
+    "title": "Notification",
+    "description": "It is a plugin that show notification like Growl",
     "version": "0.0.1",
-    "main": [
-        "./dist/the-notification.js",
-        "./dist/the-notification.css"
+    "author": "Thiago Lagden",
+    "keyword": [
+        "notification",
+        "growl",
+        "plugin"
     ],
-    "dependencies": {
-        "get-style-property": "desandro/get-style-property#~1.0.3"
-    },
+    "main": [
+        "./dist/the-notification.min.js",
+        "./dist/the-notification.min.css"
+    ],
     "ignore": [
-        "dist/",
-        "examples/",
-        "*.js",
+        "examples",
+        "dist/lib",
+        "package.json",
+        "Gulpfile.js",
         "*.coffee",
-        "*.json",
         "*.md",
         "*.sass",
-        "**/.*"
-    ]
+        ".*"
+    ],
+    "dependencies": {
+        "gsap": "~1.13.1"
+    }
 }
