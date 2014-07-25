@@ -5,6 +5,7 @@ sass        = require 'gulp-ruby-sass'
 prefix      = require 'gulp-autoprefixer'
 jade        = require 'gulp-jade'
 coffee      = require 'gulp-coffee'
+uglify      = require 'gulp-uglifyjs'
 filter      = require 'gulp-filter'
 util        = require 'gulp-util'
 
@@ -51,7 +52,20 @@ gulp.task 'coffee', ->
     .pipe reload {stream: true}
   return
 
-gulp.task 'server', ['default'], ->
+gulp.task 'uglify', ->
+  gulp.src 'dist/the-notification.js'
+    .pipe uglify 'the-notification.min.js',
+      outSourceMap: true
+    .pipe gulp.dest 'dist/'
+  return
+
+gulp.task 'watch', ->
+  gulp.watch '*.sass', ['css']
+  gulp.watch 'examples/*.jade', ['html']
+  gulp.watch '*.coffee', ['coffee', 'uglify']
+  return
+
+gulp.task 'server', ['default', 'watch'], ->
   browserSync {
     notify: false
     port: 8182
@@ -61,10 +75,4 @@ gulp.task 'server', ['default'], ->
   }
   return
 
-gulp.task 'watch', ->
-  gulp.watch '*.sass', ['css']
-  gulp.watch 'examples/*.jade', ['html']
-  gulp.watch '*.coffee', ['coffee']
-  return
-
-gulp.task 'default', ['css', 'html', 'coffee', 'watch']
+gulp.task 'default', ['css', 'html', 'coffee', 'uglify']

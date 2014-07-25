@@ -5,54 +5,50 @@ It is a plugin that show notification like Growl
 
 @author      Thiago Lagden <lagden [at] gmail.com>
 @copyright   Author
+
+Depends:
+TweenMax.js
 ###
 
 ((root, factory) ->
   if typeof define is "function" and define.amd
-    define ['getStyleProperty'], factory
+    define ['TweenMax'], factory
   else
-    root.TheNotification = factory(root.getStyleProperty)
+    root.TheNotification = factory(root.TweenMax)
   return
-) @, (getStyleProperty) ->
+) @, (TM) ->
 
   'use strict'
 
-  getTemplate = ->
-    [
-      '<h3 class="theNotification__title">{title}</h3>'
-      '<p class="theNotification__msg">{msg}</p>'
-    ].join ''
+  hasPointerEvents = Boolean window.navigator.pointerEnabled or window.navigator.msPointerEnabled
+  hasTouchEvents = 'ontouchstart' in window
+  isTouch = Boolean hasTouchEvents or hasPointerEvents
+  eventType = if isTouch then 'touchend' else 'click'
 
-  extend = ->
-    out = out or {}
-    for args in arguments
-      if args is false
-        continue
-      out[key] = args[key] for key of args when args.hasOwnProperty key
-    out
+  _privados =
+      getTemplate: () ->
+        [
+          '<h3 class="theNotification__title">{title}</h3>'
+          '<p class="theNotification__msg">{msg}</p>'
+        ].join ''
 
-  animate = (opts) ->
-    start = new Date().getTime()
+      extend: () ->
+        out = out or {}
+        for args in arguments
+          if args is false
+            continue
+          out[key] = args[key] for key of args when args.hasOwnProperty key
+        return out
 
-    run = ->
-      timePassed = new Date().getTime() - start
-      progress = timePassed / opts.duration
-      progress = 1 if progress > 1
-      delta = opts.delta progress
-      opts.step delta
+      remove: (item, ev) ->
+        @remove item
+        return
 
-      if progress == 1
-        opts.complete()
-      else
-        requestAnimationFrame(run)
-      return
-
-    requestAnimationFrame(run)
-    return
-
-  handlerRemove = (item, ev) ->
-    @remove item
-    return
+      selfRemove: (item) ->
+        setTimeout (()->
+          @remove item
+        ).bind(@), @opts.duration
+        return
 
   options = {
       duration: 5000
@@ -60,15 +56,13 @@ It is a plugin that show notification like Growl
       offset: 10
   }
 
-  transformProp = getStyleProperty 'transform'
-
   class TheNotification
     constructor: (opts) ->
       return new TheNotification(opts) if false is (@ instanceof TheNotification)
-      @opts = extend {}, options, opts
+      @opts = _privados.extend {}, options, opts
       @items = []
       @container = @opts.container or document.body
-      @template = @opts.template or getTemplate()
+      @template = @opts.template or _privados.getTemplate()
       return
 
     notifica: (t, m) ->
@@ -88,13 +82,14 @@ It is a plugin that show notification like Growl
         0
         @opts.offset
       ]
+
       last = @items[@items.length - 1]
       if last
         offset[0] = parseInt last.getAttribute('data-offset'), 10
         offset[1] = parseInt (offset[0] + last.offsetHeight + @opts.offset), 10
 
       item.setAttribute 'data-offset', offset[1]
-      item.addEventListener 'click', handlerRemove.bind(@, item), false
+      item.addEventListener eventType, _privados.remove.bind(@, item), false
 
       @items.push item
       @render item, offset
@@ -103,53 +98,31 @@ It is a plugin that show notification like Growl
     render: (item, offset) ->
       @container.appendChild item
 
-      item.style[transformProp] = 'translate3d(0,' + offset[0] + 'px,0)'
-      item.style.opacity = 0
+      from =
+        y: offset[0]
+        opacity: 0
 
-      from = offset[0]
-      to = offset[1]
+      to =
+        y: offset[1],
+        opacity: 1,
+        onComplete: _privados.selfRemove.bind(@, item)
 
-      animate {
-        duration: 500
-        delta: (p) ->
-          return 1 - Math.sin Math.acos p
-        step: (d) ->
-          t = parseInt((d * (to-from)) + from, 10)
-          item.style[transformProp] = 'translate3d(0,' + t + 'px,0)'
-          item.style.opacity = d
-          return
-        complete: (->
-          setTimeout (->
-            @remove item
-            return
-          ).bind(@), @opts.duration
-          return
-        ).bind @
-      }
+      TM.fromTo item, 0.5, from, to
       return
 
     remove: (item) ->
+      item.removeEventListener eventType, _privados.remove
+
       index = @items.indexOf item
-      item.removeEventListener 'click', handlerRemove
-      return @ if index is -1
-      @items.splice index, 1
-      from = parseInt item.style[transformProp].replace(/translate3d\(0px, ([\-0-9]+)px, 0px\)/gi, '$1'), 10
-      to = from - 30
-      animate {
-        duration: 300
-        delta: (p) ->
-          return 1 - Math.sin Math.acos p
-        step: (d) ->
-          t = parseInt((d * (to-from)) + from, 10)
-          o = (d * (0-1)) + 1;
-          item.style[transformProp] = 'translate3d(0,' + t + 'px,0)'
-          item.style.opacity = o
-          return
-        complete: (->
-          @container.removeChild item
-          return
-        ).bind @
-      }
+      @items.splice index, 1 if index isnt -1
+
+      to =
+        y: '-=30px',
+        opacity: 0,
+        onComplete: () ->
+          item.remove()
+
+      TM.to item, 0.3, to
       return
 
   return TheNotification

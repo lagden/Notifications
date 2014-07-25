@@ -1,5 +1,5 @@
 'use strict';
-var AUTOPREFIXER_BROWSERS, browserSync, coffee, filter, gulp, jade, prefix, reload, sass, util;
+var AUTOPREFIXER_BROWSERS, browserSync, coffee, filter, gulp, jade, prefix, reload, sass, uglify, util;
 
 gulp = require('gulp');
 
@@ -10,6 +10,8 @@ prefix = require('gulp-autoprefixer');
 jade = require('gulp-jade');
 
 coffee = require('gulp-coffee');
+
+uglify = require('gulp-uglifyjs');
 
 filter = require('gulp-filter');
 
@@ -46,7 +48,19 @@ gulp.task('coffee', function() {
   }));
 });
 
-gulp.task('server', ['default'], function() {
+gulp.task('uglify', function() {
+  gulp.src('dist/the-notification.js').pipe(uglify('the-notification.min.js', {
+    outSourceMap: true
+  })).pipe(gulp.dest('dist/'));
+});
+
+gulp.task('watch', function() {
+  gulp.watch('*.sass', ['css']);
+  gulp.watch('examples/*.jade', ['html']);
+  gulp.watch('*.coffee', ['coffee', 'uglify']);
+});
+
+gulp.task('server', ['default', 'watch'], function() {
   browserSync({
     notify: false,
     port: 8182,
@@ -56,10 +70,4 @@ gulp.task('server', ['default'], function() {
   });
 });
 
-gulp.task('watch', function() {
-  gulp.watch('*.sass', ['css']);
-  gulp.watch('examples/*.jade', ['html']);
-  gulp.watch('*.coffee', ['coffee']);
-});
-
-gulp.task('default', ['css', 'html', 'coffee', 'watch']);
+gulp.task('default', ['css', 'html', 'coffee', 'uglify']);

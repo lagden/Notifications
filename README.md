@@ -1,7 +1,11 @@
-theNotification.js - Notifications
-==================================
- 
+the-notification.js - Notifications
+===================================
+
 It is a plugin that show notification like Growl
+
+## Installation
+
+    bower install notifications
 
 ### Usage
 
@@ -18,7 +22,7 @@ for(var i=-1; ++i < 10;)
 
 ```javascript
 
-var growl = new TheNotification();
+var growl = new TheNotification({duration: 5000});
 
 for(var i=-1; ++i < 10;)
     growl.notifica('Count...', i);
