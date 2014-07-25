@@ -25,8 +25,11 @@ AUTOPREFIXER_BROWSERS = ['ie >= 10', 'ie_mob >= 10', 'ff >= 30', 'chrome >= 34',
 
 gulp.task('css', function() {
   gulp.src('*.sass').pipe(sass({
+    trace: true,
     sourcemap: true,
-    sourcemapPath: './'
+    sourcemapPath: './',
+    style: 'compressed',
+    noCache: true
   })).pipe(prefix(AUTOPREFIXER_BROWSERS)).pipe(gulp.dest('dist/')).pipe(filter('*.css')).pipe(reload({
     stream: true
   }));

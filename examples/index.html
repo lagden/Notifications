@@ -15,9 +15,9 @@
     <script src="lib/gsap/src/uncompressed/TweenMax.js"></script>
     <script src="the-notification.js"></script>
     <script>
-      var n = TheNotification({duration: 5000});
+      var growl = TheNotification({duration: 5000});
       document.querySelector('#call').addEventListener('click', function(){
-          n.notifica('Hey!', 'Coffee with vanilla is nice!!');
+          growl.notifica('Hey!', 'Coffee with vanilla is nice!!');
       }, false);
     </script>
   </body>
