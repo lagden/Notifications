@@ -14,7 +14,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
 
 (function(root, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['TweenMax'], factory);
+    define(['greensock/TweenMax'], factory);
   } else {
     root.TheNotification = factory(root.TweenMax);
   }
