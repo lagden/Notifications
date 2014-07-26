@@ -119,7 +119,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         this.items.splice(index, 1);
       }
       to = {
-        y: '-=30px',
+        y: '-=30',
         opacity: 0,
         onComplete: function() {
           return item.remove();
