@@ -1,5 +1,5 @@
-the-notification.js - Notifications
-===================================
+Notifications
+=============
 
 It is a plugin that show notification like Growl
 

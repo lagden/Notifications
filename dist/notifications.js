@@ -1,6 +1,6 @@
 
 /*
-theNotification.js - Notifications
+notification.js - Notifications
 
 It is a plugin that show notification like Growl
 
@@ -16,14 +16,15 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
   if (typeof define === "function" && define.amd) {
     define(['greensock/TweenMax'], factory);
   } else {
-    root.TheNotification = factory(root.TweenMax);
+    root.Notifications = factory(root.TweenMax);
   }
 })(this, function(TM) {
   'use strict';
-  var TheNotification, eventType, hasPointerEvents, hasTouchEvents, isTouch, options, _privados;
-  hasPointerEvents = Boolean(window.navigator.pointerEnabled || window.navigator.msPointerEnabled);
+  var Notifications, eventType, hasPointerEvents, hasTouchEvents, isTouch, options, wn, _privados;
+  wn = window.navigator;
+  hasPointerEvents = Boolean(wn.pointerEnabled || wn.msPointerEnabled);
   hasTouchEvents = __indexOf.call(window, 'ontouchstart') >= 0;
-  isTouch = Boolean(hasTouchEvents || hasPointerEvents);
+  isTouch = hasTouchEvents || hasPointerEvents;
   eventType = isTouch ? 'touchend' : 'click';
   _privados = {
     getTemplate: function() {
@@ -59,10 +60,10 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
     container: null,
     offset: 10
   };
-  TheNotification = (function() {
-    function TheNotification(opts) {
-      if (false === (this instanceof TheNotification)) {
-        return new TheNotification(opts);
+  Notifications = (function() {
+    function Notifications(opts) {
+      if (false === (this instanceof Notifications)) {
+        return new Notifications(opts);
       }
       this.opts = _privados.extend({}, options, opts);
       this.items = [];
@@ -71,7 +72,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       return;
     }
 
-    TheNotification.prototype.notifica = function(t, m) {
+    Notifications.prototype.notifica = function(t, m) {
       var content, item, last, offset, r;
       r = {
         title: t,
@@ -96,7 +97,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       this.render(item, offset);
     };
 
-    TheNotification.prototype.render = function(item, offset) {
+    Notifications.prototype.render = function(item, offset) {
       var from, to;
       this.container.appendChild(item);
       from = {
@@ -111,7 +112,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       TM.fromTo(item, 0.5, from, to);
     };
 
-    TheNotification.prototype.remove = function(item) {
+    Notifications.prototype.remove = function(item) {
       var index, to;
       item.removeEventListener(eventType, _privados.remove);
       index = this.items.indexOf(item);
@@ -128,8 +129,8 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       TM.to(item, 0.3, to);
     };
 
-    return TheNotification;
+    return Notifications;
 
   })();
-  return TheNotification;
+  return Notifications;
 });

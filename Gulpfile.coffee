@@ -5,6 +5,7 @@ sass        = require 'gulp-ruby-sass'
 prefix      = require 'gulp-autoprefixer'
 jade        = require 'gulp-jade'
 coffee      = require 'gulp-coffee'
+coffeelint  = require 'gulp-coffeelint'
 uglify      = require 'gulp-uglifyjs'
 filter      = require 'gulp-filter'
 util        = require 'gulp-util'
@@ -24,58 +25,82 @@ AUTOPREFIXER_BROWSERS = [
   'bb >= 10'
 ]
 
-gulp.task 'css', ->
-  gulp.src '*.sass'
-    .pipe sass {
+map =
+  sass:
+    src: 'src/*.sass'
+    dest: 'dist/'
+  coffee:
+    src: 'src/*.coffee'
+    dest: 'dist/'
+  uglify:
+    src: 'dist/notifications.js'
+    min: 'notifications.min.js'
+    dest: 'dist/'
+  pkg:
+    src: [
+      'dist/{,*/}/gsap/src/uncompressed/TweenMax.js'
+      'dist/notifications.js'
+    ]
+    min: 'notifications.pkg.min.js'
+    dest: 'dist/'
+  jade:
+    src: 'src/*.jade'
+    dest: 'examples/'
+
+console.log map.pkg.src
+
+gulp.task 'sass', ->
+  gulp.src map.sass.src
+    .pipe sass
       trace         : true
       sourcemap     : true
-      sourcemapPath : './'
+      sourcemapPath : '../dist'
       style         : 'compressed'
       noCache       : true
-    }
     .pipe prefix AUTOPREFIXER_BROWSERS
-    .pipe gulp.dest 'dist/'
+    .pipe gulp.dest map.sass.dest
     .pipe filter '*.css'
-    .pipe reload {stream: true}
-  return
+    .pipe reload stream: true
 
-gulp.task 'html', ->
-  gulp.src 'examples/*.jade'
-    .pipe jade {
-        pretty: true
-      }
-    .pipe gulp.dest 'examples/'
-    .pipe reload {stream: true}
-  return
+gulp.task 'lint', ->
+  gulp.src map.coffee.src
+    .pipe coffeelint()
+    .pipe coffeelint.reporter()
 
 gulp.task 'coffee', ->
-  gulp.src '*.coffee'
+  gulp.src map.coffee.src
     .pipe coffee(bare: true).on 'error', util.log
-    .pipe gulp.dest 'dist/'
-    .pipe reload {stream: true}
-  return
+    .pipe gulp.dest map.coffee.dest
+    .pipe reload stream: true
 
 gulp.task 'uglify', ->
-  gulp.src 'dist/the-notification.js'
-    .pipe uglify 'the-notification.min.js',
-      outSourceMap: true
-    .pipe gulp.dest 'dist/'
-  return
+  gulp.src map.uglify.src
+    .pipe uglify map.uglify.min, outSourceMap: true
+    .pipe gulp.dest map.uglify.dest
+
+gulp.task 'pkg', ->
+  gulp.src map.pkg.src, base: map.pkg.dest
+    .pipe uglify map.pkg.min, outSourceMap: true
+    .pipe gulp.dest map.pkg.dest
+
+gulp.task 'jade', ->
+  gulp.src map.jade.src
+    .pipe jade pretty: true
+    .pipe gulp.dest map.jade.dest
+    .pipe reload stream: true
 
 gulp.task 'watch', ->
-  gulp.watch '*.sass', ['css']
-  gulp.watch 'examples/*.jade', ['html']
-  gulp.watch '*.coffee', ['coffee', 'uglify']
+  gulp.watch map.sass.src, ['sass']
+  gulp.watch map.coffee.src, ['lint', 'coffee', 'uglify', 'pkg']
+  gulp.watch map.jade.src, ['jade']
   return
 
 gulp.task 'server', ['default', 'watch'], ->
-  browserSync {
+  browserSync
     notify: false
     port: 8182
-    server: {
+    server:
       baseDir: ['examples', 'dist']
-    }
-  }
   return
 
-gulp.task 'default', ['css', 'html', 'coffee', 'uglify']
+gulp.task 'default', ['sass', 'jade', 'lint', 'coffee', 'uglify', 'pkg']

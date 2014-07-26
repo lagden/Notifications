@@ -1,5 +1,5 @@
 ###
-theNotification.js - Notifications
+notification.js - Notifications
 
 It is a plugin that show notification like Growl
 
@@ -14,15 +14,16 @@ TweenMax.js
   if typeof define is "function" and define.amd
     define ['greensock/TweenMax'], factory
   else
-    root.TheNotification = factory(root.TweenMax)
+    root.Notifications = factory(root.TweenMax)
   return
 ) @, (TM) ->
 
   'use strict'
 
-  hasPointerEvents = Boolean window.navigator.pointerEnabled or window.navigator.msPointerEnabled
+  wn = window.navigator
+  hasPointerEvents = Boolean wn.pointerEnabled or wn.msPointerEnabled
   hasTouchEvents = 'ontouchstart' in window
-  isTouch = Boolean hasTouchEvents or hasPointerEvents
+  isTouch = hasTouchEvents or hasPointerEvents
   eventType = if isTouch then 'touchend' else 'click'
 
   _privados =
@@ -50,15 +51,15 @@ TweenMax.js
         ).bind(@), @opts.duration
         return
 
-  options = {
-      duration: 5000
-      container: null
-      offset: 10
-  }
+  options =
+    duration: 5000
+    container: null
+    offset: 10
 
-  class TheNotification
+  class Notifications
     constructor: (opts) ->
-      return new TheNotification(opts) if false is (@ instanceof TheNotification)
+      if false is (@ instanceof Notifications)
+        return new Notifications(opts)
       @opts = _privados.extend {}, options, opts
       @items = []
       @container = @opts.container or document.body
@@ -66,10 +67,9 @@ TweenMax.js
       return
 
     notifica: (t, m) ->
-      r = {
+      r =
         title: t
         msg: m
-      }
       content = @template.replace /\{(.*?)\}/g, (a, b) ->
         return r[b]
 
@@ -125,4 +125,4 @@ TweenMax.js
       TM.to item, 0.3, to
       return
 
-  return TheNotification
+  return Notifications

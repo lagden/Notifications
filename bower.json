@@ -2,7 +2,7 @@
     "name": "notifications",
     "title": "Notifications",
     "description": "It is a plugin that show notification like Growl",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "author": "Thiago Lagden",
     "keyword": [
         "notification",
@@ -10,17 +10,17 @@
         "plugin"
     ],
     "main": [
-        "./dist/the-notification.min.js",
-        "./dist/the-notification.min.css"
+        "./notifications.js",
+        "./notifications.css"
     ],
     "ignore": [
+        "src",
         "examples",
         "dist/lib",
         "package.json",
         "Gulpfile.js",
-        "*.coffee",
-        "*.md",
-        "*.sass",
+        "Gulpfile.coffee",
+        "README.md",
         ".*"
     ],
     "dependencies": {
