@@ -9,26 +9,28 @@ It is a plugin that show notification like Growl
 
 ### Usage
 
-**RequireJS**
+**AMD**
 
 ```javascript
-var growl = require('theNotification')();
+require(['notifications'], function(notifications) {
 
-for(var i=-1; ++i < 10;)
-    growl.notifica('Count...', i);
+    'use strict';
+
+    var growl = notifications();
+    for(var i=-1; ++i < 10;)
+        growl.notifica('Count...', i);
+});
 ```
 
 **Global**
 
 ```javascript
-
-var growl = new TheNotification({duration: 5000});
+var growl = new Notifications({duration: 5000});
 
 for(var i=-1; ++i < 10;)
     growl.notifica('Count...', i);
-
 ```
 
-### Author
+## Author
 
 [Thiago Lagden](http://lagden.in)
