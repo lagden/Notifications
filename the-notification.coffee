@@ -117,7 +117,7 @@ TweenMax.js
       @items.splice index, 1 if index isnt -1
 
       to =
-        y: '-=30px',
+        y: '-=30',
         opacity: 0,
         onComplete: () ->
           item.remove()
