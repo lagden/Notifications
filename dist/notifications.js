@@ -120,7 +120,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         this.items.splice(index, 1);
       }
       onCompleteRemove = (function() {
-        return this.container.removeChild(item);
+        this.container.removeChild(item);
       }).bind(this);
       to = {
         y: '-=30',

@@ -118,6 +118,7 @@ TweenMax.js
 
       onCompleteRemove = (() ->
         @container.removeChild(item)
+        return
       ).bind @
 
 
