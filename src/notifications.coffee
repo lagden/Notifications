@@ -116,11 +116,15 @@ TweenMax.js
       index = @items.indexOf item
       @items.splice index, 1 if index isnt -1
 
+      onCompleteRemove = (() ->
+        @container.removeChild(item)
+      ).bind @
+
+
       to =
         y: '-=30',
         opacity: 0,
-        onComplete: () ->
-          item.remove()
+        onComplete: onCompleteRemove
 
       TM.to item, 0.3, to
       return
