@@ -6916,6 +6916,24 @@ TweenMax.js
 })(this, function(TM) {
   'use strict';
   var Notifications, options, _privados;
+  if (!window.CustomEvent) {
+    (function() {
+      var CustomEvent;
+      CustomEvent = function(event, params) {
+        var evt;
+        params = params || {
+          bubbles: false,
+          cancelable: false,
+          detail: void 0
+        };
+        evt = document.createEvent("CustomEvent");
+        evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+        return evt;
+      };
+      CustomEvent.prototype = window.Event.prototype;
+      window.CustomEvent = CustomEvent;
+    })();
+  }
   _privados = {
     getTemplate: function() {
       return ['<h3 class="theNotification__title">{title}</h3>', '<p class="theNotification__msg">{msg}</p>'].join('');

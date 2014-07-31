@@ -85,12 +85,12 @@ gulp.task 'lint', ->
     .pipe coffeelint()
     .pipe coffeelint.reporter()
 
-gulp.task 'coffee', ['lint'], ->
+gulp.task 'coffee', ->
   gulp.src map.coffee.src
     .pipe coffee(bare: true).on 'error', util.log
     .pipe gulp.dest map.coffee.dest
 
-gulp.task 'pkg', ['coffee'], ->
+gulp.task 'pkg', ->
   gulp.src map.pkg.src
     .pipe concat map.pkg.out
     .pipe gulp.dest map.pkg.dest
@@ -109,17 +109,25 @@ gulp.task 'uglify', ->
 
 gulp.task 'watch', ->
   gulp.watch [map.sass.src], ['sass']
-  gulp.watch [map.coffee.src], ['pkg']
+  gulp.watch [map.coffee.src], ['scripts']
   gulp.watch [map.jade.src], ['jade']
   return
 
 gulp.task 'clean', del.bind null, map.clean.src
 
-gulp.task 'default', ->
-  runSequence 'clean', ['jade', 'sass'], 'pkg', 'uglify'
+gulp.task 'scripts', ->
+  runSequence 'lint', 'coffee', 'pkg'
   return
 
-gulp.task 'server', ['default', 'watch'], ->
+gulp.task 'default', ->
+  runSequence 'clean', ['jade', 'sass', 'scripts'], 'uglify'
+  return
+
+gulp.task 'server', ->
+  runSequence 'default', 'watch'
+  return
+
+gulp.task 'browser', ['server'], ->
   browserSync
     notify: true
     port: 8182

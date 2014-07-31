@@ -20,25 +20,26 @@ TweenMax.js
 
   'use strict'
 
-  # CustomEvent() constructor functionality in Internet Explorer 9 and 10
-  # (->
-  #   CustomEvent = (event, params) ->
-  #     params = params or
-  #       bubbles: false
-  #       cancelable: false
-  #       detail: undefined
+  # CustomEvent() constructor functionality in Internet Explorer
+  unless window.CustomEvent
+    (->
+      CustomEvent = (event, params) ->
+        params = params or
+          bubbles: false
+          cancelable: false
+          detail: undefined
 
-  #     evt = document.createEvent "CustomEvent"
-  #     evt.initCustomEvent event,
-  #                         params.bubbles,
-  #                         params.cancelable,
-  #                         params.detail
-  #     return evt
+        evt = document.createEvent "CustomEvent"
+        evt.initCustomEvent event,
+                            params.bubbles,
+                            params.cancelable,
+                            params.detail
+        return evt
 
-  #   CustomEvent:: = window.Event::
-  #   window.CustomEvent = CustomEvent
-  #   return
-  # )()
+      CustomEvent:: = window.Event::
+      window.CustomEvent = CustomEvent
+      return
+    )()
 
   _privados =
       getTemplate: () ->
