@@ -1,9 +1,9 @@
 doctype
-html(lang="en")
+html(lang='en')
     head
         meta(charset='utf8')
         meta(http-equiv='X-UA-Compatible', content='IE=edge, chrome=1')
-        meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
+        meta(name='viewport', content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no')
         meta(name='description', content='Example')
         meta(name='author', content= 'Thiago Lagden')
         link(rel='stylesheet', type='text/css', href='notifications.css')
@@ -11,7 +11,7 @@ html(lang="en")
     body
         h1 Exemplo
         button#call Notifica
-        script(src="notifications.pkg.min.js")
+        script(src='notifications.pkg.js')
         script.
             var growl = new Notifications({duration: 5000});
             document.querySelector('#call').addEventListener('click', function(){

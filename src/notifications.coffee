@@ -20,11 +20,25 @@ TweenMax.js
 
   'use strict'
 
-  wn = window.navigator
-  hasPointerEvents = Boolean wn.pointerEnabled or wn.msPointerEnabled
-  hasTouchEvents = 'ontouchstart' in window
-  isTouch = hasTouchEvents or hasPointerEvents
-  eventType = if isTouch then 'touchend' else 'click'
+  # CustomEvent() constructor functionality in Internet Explorer 9 and 10
+  # (->
+  #   CustomEvent = (event, params) ->
+  #     params = params or
+  #       bubbles: false
+  #       cancelable: false
+  #       detail: undefined
+
+  #     evt = document.createEvent "CustomEvent"
+  #     evt.initCustomEvent event,
+  #                         params.bubbles,
+  #                         params.cancelable,
+  #                         params.detail
+  #     return evt
+
+  #   CustomEvent:: = window.Event::
+  #   window.CustomEvent = CustomEvent
+  #   return
+  # )()
 
   _privados =
       getTemplate: () ->
@@ -41,14 +55,10 @@ TweenMax.js
           out[key] = args[key] for key of args when args.hasOwnProperty key
         return out
 
-      remove: (item, ev) ->
-        @remove item
-        return
-
-      selfRemove: (item) ->
+      selfRemove: (item, duration) ->
         setTimeout (()->
-          @remove item
-        ).bind(@), @opts.duration
+          item.dispatchEvent(new CustomEvent 'click')
+        ), duration
         return
 
   options =
@@ -62,6 +72,7 @@ TweenMax.js
         return new Notifications(opts)
       @opts = _privados.extend {}, options, opts
       @items = []
+      @events = {}
       @container = @opts.container or document.body
       @template = @opts.template or _privados.getTemplate()
       return
@@ -78,18 +89,19 @@ TweenMax.js
       item.style.opacity = 0
       item.insertAdjacentHTML 'afterbegin', content
 
-      offset = [
-        0
-        @opts.offset
-      ]
+      offset = [0, @opts.offset]
 
       last = @items[@items.length - 1]
       if last
         offset[0] = parseInt last.getAttribute('data-offset'), 10
         offset[1] = parseInt (offset[0] + last.offsetHeight + @opts.offset), 10
 
+      randEventName = 'evt' + String(Math.random() * Date.now()).split('.')[0]
+      @events[randEventName] = @remove.bind @
+
       item.setAttribute 'data-offset', offset[1]
-      item.addEventListener eventType, _privados.remove.bind(@, item), false
+      item.setAttribute 'data-event', randEventName
+      item.addEventListener 'click', @events[randEventName], false
 
       @items.push item
       @render item, offset
@@ -105,29 +117,32 @@ TweenMax.js
       to =
         y: offset[1],
         opacity: 1,
-        onComplete: _privados.selfRemove.bind(@, item)
+        onComplete: _privados.selfRemove
+        onCompleteParams: [item, @opts.duration]
 
       TM.fromTo item, 0.5, from, to
       return
 
-    remove: (item) ->
-      item.removeEventListener eventType, _privados.remove
+    remove: (event) ->
+      item = event.currentTarget
 
-      index = @items.indexOf item
-      @items.splice index, 1 if index isnt -1
+      randEventName = item.getAttribute 'data-event'
+      item.removeEventListener 'click', @events[randEventName], false
 
-      onCompleteRemove = (() ->
-        @container.removeChild(item)
+      onCompleteRemove = (item) ->
+        index = @items.indexOf item
+        if index isnt -1
+          @container.removeChild @items[index]
+          @items.splice index, 1
         return
-      ).bind @
-
 
       to =
         y: '-=30',
         opacity: 0,
-        onComplete: onCompleteRemove
+        onComplete: onCompleteRemove.bind @, item
 
       TM.to item, 0.3, to
+
       return
 
   return Notifications

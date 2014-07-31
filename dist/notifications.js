@@ -10,8 +10,6 @@ It is a plugin that show notification like Growl
 Depends:
 TweenMax.js
  */
-var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
-
 (function(root, factory) {
   if (typeof define === "function" && define.amd) {
     define(['greensock/TweenMax'], factory);
@@ -20,12 +18,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
   }
 })(this, function(TM) {
   'use strict';
-  var Notifications, eventType, hasPointerEvents, hasTouchEvents, isTouch, options, wn, _privados;
-  wn = window.navigator;
-  hasPointerEvents = Boolean(wn.pointerEnabled || wn.msPointerEnabled);
-  hasTouchEvents = __indexOf.call(window, 'ontouchstart') >= 0;
-  isTouch = hasTouchEvents || hasPointerEvents;
-  eventType = isTouch ? 'touchend' : 'click';
+  var Notifications, options, _privados;
   _privados = {
     getTemplate: function() {
       return ['<h3 class="theNotification__title">{title}</h3>', '<p class="theNotification__msg">{msg}</p>'].join('');
@@ -46,13 +39,10 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       }
       return out;
     },
-    remove: function(item, ev) {
-      this.remove(item);
-    },
-    selfRemove: function(item) {
+    selfRemove: function(item, duration) {
       setTimeout((function() {
-        return this.remove(item);
-      }).bind(this), this.opts.duration);
+        return item.dispatchEvent(new CustomEvent('click'));
+      }), duration);
     }
   };
   options = {
@@ -67,13 +57,14 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       }
       this.opts = _privados.extend({}, options, opts);
       this.items = [];
+      this.events = {};
       this.container = this.opts.container || document.body;
       this.template = this.opts.template || _privados.getTemplate();
       return;
     }
 
     Notifications.prototype.notifica = function(t, m) {
-      var content, item, last, offset, r;
+      var content, item, last, offset, r, randEventName;
       r = {
         title: t,
         msg: m
@@ -91,8 +82,11 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         offset[0] = parseInt(last.getAttribute('data-offset'), 10);
         offset[1] = parseInt(offset[0] + last.offsetHeight + this.opts.offset, 10);
       }
+      randEventName = 'evt' + String(Math.random() * Date.now()).split('.')[0];
+      this.events[randEventName] = this.remove.bind(this);
       item.setAttribute('data-offset', offset[1]);
-      item.addEventListener(eventType, _privados.remove.bind(this, item), false);
+      item.setAttribute('data-event', randEventName);
+      item.addEventListener('click', this.events[randEventName], false);
       this.items.push(item);
       this.render(item, offset);
     };
@@ -107,25 +101,29 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       to = {
         y: offset[1],
         opacity: 1,
-        onComplete: _privados.selfRemove.bind(this, item)
+        onComplete: _privados.selfRemove,
+        onCompleteParams: [item, this.opts.duration]
       };
       TM.fromTo(item, 0.5, from, to);
     };
 
-    Notifications.prototype.remove = function(item) {
-      var index, onCompleteRemove, to;
-      item.removeEventListener(eventType, _privados.remove);
-      index = this.items.indexOf(item);
-      if (index !== -1) {
-        this.items.splice(index, 1);
-      }
-      onCompleteRemove = (function() {
-        this.container.removeChild(item);
-      }).bind(this);
+    Notifications.prototype.remove = function(event) {
+      var item, onCompleteRemove, randEventName, to;
+      item = event.currentTarget;
+      randEventName = item.getAttribute('data-event');
+      item.removeEventListener('click', this.events[randEventName], false);
+      onCompleteRemove = function(item) {
+        var index;
+        index = this.items.indexOf(item);
+        if (index !== -1) {
+          this.container.removeChild(this.items[index]);
+          this.items.splice(index, 1);
+        }
+      };
       to = {
         y: '-=30',
         opacity: 0,
-        onComplete: onCompleteRemove
+        onComplete: onCompleteRemove.bind(this, item)
       };
       TM.to(item, 0.3, to);
     };

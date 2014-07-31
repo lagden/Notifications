@@ -7,8 +7,11 @@ jade        = require 'gulp-jade'
 coffee      = require 'gulp-coffee'
 coffeelint  = require 'gulp-coffeelint'
 uglify      = require 'gulp-uglifyjs'
+concat      = require 'gulp-concat'
 filter      = require 'gulp-filter'
 util        = require 'gulp-util'
+del         = require 'del'
+runSequence = require 'run-sequence'
 
 browserSync = require 'browser-sync'
 reload      = browserSync.reload
@@ -26,28 +29,43 @@ AUTOPREFIXER_BROWSERS = [
 ]
 
 map =
-  sass:
-    src: 'src/*.sass'
-    dest: 'dist/'
-  coffee:
-    src: 'src/*.coffee'
-    dest: 'dist/'
-  uglify:
-    src: 'dist/notifications.js'
-    min: 'notifications.min.js'
-    dest: 'dist/'
-  pkg:
-    src: [
-      'dist/{,*/}/gsap/src/uncompressed/TweenMax.js'
-      'dist/notifications.js'
-    ]
-    min: 'notifications.pkg.min.js'
-    dest: 'dist/'
   jade:
     src: 'src/*.jade'
     dest: 'examples/'
 
-console.log map.pkg.src
+  sass:
+    src: 'src/*.sass'
+    dest: 'dist/'
+
+  clean:
+    src: 'dist/{*.css,*.js,*.map}'
+
+  coffee:
+    src: 'src/*.coffee'
+    dest: 'dist/'
+
+  pkg:
+    src: [
+      'dist/lib/gsap/src/uncompressed/TweenMax.js'
+      'dist/notifications.js'
+    ]
+    out: 'notifications.pkg.js'
+    dest: 'dist/'
+
+  uglify:
+    src:
+      file: 'dist/notifications.js'
+      pkg: 'dist/notifications.pkg.js'
+    out:
+      file: 'notifications.min.js'
+      pkg: 'notifications.pkg.min.js'
+    dest: 'dist/'
+
+gulp.task 'jade', ->
+  gulp.src map.jade.src
+    .pipe jade pretty: true
+    .pipe gulp.dest map.jade.dest
+    .pipe reload stream: true
 
 gulp.task 'sass', ->
   gulp.src map.sass.src
@@ -67,40 +85,44 @@ gulp.task 'lint', ->
     .pipe coffeelint()
     .pipe coffeelint.reporter()
 
-gulp.task 'coffee', ->
+gulp.task 'coffee', ['lint'], ->
   gulp.src map.coffee.src
     .pipe coffee(bare: true).on 'error', util.log
     .pipe gulp.dest map.coffee.dest
+
+gulp.task 'pkg', ['coffee'], ->
+  gulp.src map.pkg.src
+    .pipe concat map.pkg.out
+    .pipe gulp.dest map.pkg.dest
     .pipe reload stream: true
 
 gulp.task 'uglify', ->
-  gulp.src map.uglify.src
-    .pipe uglify map.uglify.min, outSourceMap: true
+  gulp.src map.uglify.src.file
+    .pipe uglify map.uglify.out.file, outSourceMap: true
     .pipe gulp.dest map.uglify.dest
 
-gulp.task 'pkg', ->
-  gulp.src map.pkg.src, base: map.pkg.dest
-    .pipe uglify map.pkg.min, outSourceMap: true
-    .pipe gulp.dest map.pkg.dest
+  gulp.src map.uglify.src.pkg
+    .pipe uglify map.uglify.out.pkg, outSourceMap: true
+    .pipe gulp.dest map.uglify.dest
 
-gulp.task 'jade', ->
-  gulp.src map.jade.src
-    .pipe jade pretty: true
-    .pipe gulp.dest map.jade.dest
-    .pipe reload stream: true
+  return
 
 gulp.task 'watch', ->
-  gulp.watch map.sass.src, ['sass']
-  gulp.watch map.coffee.src, ['lint', 'coffee', 'uglify', 'pkg']
-  gulp.watch map.jade.src, ['jade']
+  gulp.watch [map.sass.src], ['sass']
+  gulp.watch [map.coffee.src], ['pkg']
+  gulp.watch [map.jade.src], ['jade']
+  return
+
+gulp.task 'clean', del.bind null, map.clean.src
+
+gulp.task 'default', ->
+  runSequence 'clean', ['jade', 'sass'], 'pkg', 'uglify'
   return
 
 gulp.task 'server', ['default', 'watch'], ->
   browserSync
-    notify: false
+    notify: true
     port: 8182
     server:
       baseDir: ['examples', 'dist']
   return
-
-gulp.task 'default', ['sass', 'jade', 'lint', 'coffee', 'uglify', 'pkg']
