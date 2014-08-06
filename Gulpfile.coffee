@@ -1,15 +1,16 @@
 'use strict'
 
 gulp        = require 'gulp'
-sass        = require 'gulp-ruby-sass'
 prefix      = require 'gulp-autoprefixer'
-jade        = require 'gulp-jade'
 coffee      = require 'gulp-coffee'
 coffeelint  = require 'gulp-coffeelint'
-uglify      = require 'gulp-uglifyjs'
 concat      = require 'gulp-concat'
 filter      = require 'gulp-filter'
+jade        = require 'gulp-jade'
+sass        = require 'gulp-ruby-sass'
+uglify      = require 'gulp-uglifyjs'
 util        = require 'gulp-util'
+
 del         = require 'del'
 runSequence = require 'run-sequence'
 
@@ -127,7 +128,7 @@ gulp.task 'server', ->
   runSequence 'default', 'watch'
   return
 
-gulp.task 'browser', ['server'], ->
+gulp.task 'start', ['server'], ->
   browserSync
     notify: true
     port: 8182

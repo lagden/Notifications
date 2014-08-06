@@ -6915,7 +6915,7 @@ TweenMax.js
   }
 })(this, function(TM) {
   'use strict';
-  var Notifications, options, _privados;
+  var Notifications, options, _SPL;
   if (!window.CustomEvent) {
     (function() {
       var CustomEvent;
@@ -6934,30 +6934,22 @@ TweenMax.js
       window.CustomEvent = CustomEvent;
     })();
   }
-  _privados = {
+  _SPL = {
     getTemplate: function() {
       return ['<h3 class="theNotification__title">{title}</h3>', '<p class="theNotification__msg">{msg}</p>'].join('');
     },
-    extend: function() {
-      var args, key, out, _i, _len;
-      out = out || {};
-      for (_i = 0, _len = arguments.length; _i < _len; _i++) {
-        args = arguments[_i];
-        if (args === false) {
-          continue;
-        }
-        for (key in args) {
-          if (args.hasOwnProperty(key)) {
-            out[key] = args[key];
-          }
-        }
+    extend: function(a, b) {
+      var prop;
+      for (prop in b) {
+        a[prop] = b[prop];
       }
-      return out;
+      return a;
     },
     selfRemove: function(item, duration) {
-      setTimeout((function() {
-        return item.dispatchEvent(new CustomEvent('click'));
-      }), duration);
+      setTimeout(function() {
+        item.dispatchEvent(new CustomEvent('click'));
+        item = null;
+      }, duration);
     }
   };
   options = {
@@ -6967,15 +6959,14 @@ TweenMax.js
   };
   Notifications = (function() {
     function Notifications(opts) {
-      if (false === (this instanceof Notifications)) {
+      if ((this instanceof Notifications) === false) {
         return new Notifications(opts);
       }
-      this.opts = _privados.extend({}, options, opts);
+      this.opts = _SPL.extend(options, opts);
       this.items = [];
       this.events = {};
       this.container = this.opts.container || document.body;
-      this.template = this.opts.template || _privados.getTemplate();
-      return;
+      this.template = this.opts.template || _SPL.getTemplate();
     }
 
     Notifications.prototype.notifica = function(t, m) {
@@ -7003,10 +6994,11 @@ TweenMax.js
       item.setAttribute('data-event', randEventName);
       item.addEventListener('click', this.events[randEventName], false);
       this.items.push(item);
-      this.render(item, offset);
+      this.put(item, offset);
+      item = null;
     };
 
-    Notifications.prototype.render = function(item, offset) {
+    Notifications.prototype.put = function(item, offset) {
       var from, to;
       this.container.appendChild(item);
       from = {
@@ -7016,10 +7008,11 @@ TweenMax.js
       to = {
         y: offset[1],
         opacity: 1,
-        onComplete: _privados.selfRemove,
+        onComplete: _SPL.selfRemove,
         onCompleteParams: [item, this.opts.duration]
       };
       TM.fromTo(item, 0.5, from, to);
+      item = null;
     };
 
     Notifications.prototype.remove = function(event) {
@@ -7027,6 +7020,7 @@ TweenMax.js
       item = event.currentTarget;
       randEventName = item.getAttribute('data-event');
       item.removeEventListener('click', this.events[randEventName], false);
+      delete this.events[randEventName];
       onCompleteRemove = function(item) {
         var index;
         index = this.items.indexOf(item);
@@ -7034,6 +7028,7 @@ TweenMax.js
           this.container.removeChild(this.items[index]);
           this.items.splice(index, 1);
         }
+        item = null;
       };
       to = {
         y: '-=30',
@@ -7041,6 +7036,7 @@ TweenMax.js
         onComplete: onCompleteRemove.bind(this, item)
       };
       TM.to(item, 0.3, to);
+      item = null;
     };
 
     return Notifications;
