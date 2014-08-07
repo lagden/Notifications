@@ -10,8 +10,8 @@
     "plugin"
   ],
   "main": [
-    "./notifications.js",
-    "./notifications.css"
+    "dist/notifications.js",
+    "dist/notifications.css"
   ],
   "ignore": [
     "src",
