@@ -14,7 +14,7 @@
     <button id="call">Notifica</button>
     <script src="notifications.pkg.js"></script>
     <script>
-      var growl = new Notifications({duration: 5000});
+      var growl = Notifications({duration: 5000});
       document.querySelector('#call').addEventListener('click', function(){
           growl.notifica('Hey!', 'Coffee with vanilla is nice!!');
       }, false);

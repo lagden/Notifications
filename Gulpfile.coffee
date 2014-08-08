@@ -31,35 +31,30 @@ AUTOPREFIXER_BROWSERS = [
 
 map =
   jade:
-    src: 'src/*.jade'
+    src:  'src/*.jade'
     dest: 'examples/'
-
   sass:
-    src: 'src/*.sass'
+    src:  'src/*.sass'
     dest: 'dist/'
-
   clean:
     src: 'dist/{*.css,*.js,*.map}'
-
   coffee:
-    src: 'src/*.coffee'
+    src:  'src/*.coffee'
     dest: 'dist/'
-
   pkg:
     src: [
       'dist/lib/gsap/src/uncompressed/TweenMax.js'
       'dist/notifications.js'
     ]
-    out: 'notifications.pkg.js'
+    out:  'notifications.pkg.js'
     dest: 'dist/'
-
   uglify:
     src:
       file: 'dist/notifications.js'
-      pkg: 'dist/notifications.pkg.js'
+      pkg:  'dist/notifications.pkg.js'
     out:
       file: 'notifications.min.js'
-      pkg: 'notifications.pkg.min.js'
+      pkg:  'notifications.pkg.min.js'
     dest: 'dist/'
 
 gulp.task 'jade', ->
@@ -97,41 +92,40 @@ gulp.task 'pkg', ->
     .pipe gulp.dest map.pkg.dest
     .pipe reload stream: true
 
-gulp.task 'uglify', ->
+gulp.task 'uglify-file', ->
   gulp.src map.uglify.src.file
     .pipe uglify map.uglify.out.file, outSourceMap: true
     .pipe gulp.dest map.uglify.dest
 
+gulp.task 'uglify-pkg', ->
   gulp.src map.uglify.src.pkg
     .pipe uglify map.uglify.out.pkg, outSourceMap: true
     .pipe gulp.dest map.uglify.dest
 
-  return
+gulp.task 'clean', ->
+  del map.clean.src, ->
+    return
 
 gulp.task 'watch', ->
   gulp.watch [map.sass.src], ['sass']
-  gulp.watch [map.coffee.src], ['scripts']
   gulp.watch [map.jade.src], ['jade']
+  gulp.watch [map.coffee.src], ['script']
   return
 
-gulp.task 'clean', del.bind null, map.clean.src
-
-gulp.task 'scripts', ->
+gulp.task 'script', ->
   runSequence 'lint', 'coffee', 'pkg'
   return
 
+gulp.task 'start', ->
+  runSequence 'clean', ['jade', 'sass', 'script'], 'watch', ->
+    browserSync
+      notify: true
+      port: 8182
+      server:
+        baseDir: ['examples', 'dist']
+    return
+  return
+
 gulp.task 'default', ->
-  runSequence 'clean', ['jade', 'sass', 'scripts'], 'uglify'
-  return
-
-gulp.task 'server', ->
-  runSequence 'default', 'watch'
-  return
-
-gulp.task 'start', ['server'], ->
-  browserSync
-    notify: true
-    port: 8182
-    server:
-      baseDir: ['examples', 'dist']
+  runSequence 'clean', ['jade', 'sass'], 'lint', 'coffee', 'pkg', ['uglify-file', 'uglify-pkg']
   return
