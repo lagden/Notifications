@@ -117,7 +117,9 @@ gulp.task 'script', ->
   return
 
 gulp.task 'start', ->
-  runSequence 'clean', ['jade', 'sass', 'script'], 'watch', ->
+  runSequence 'clean',
+              ['jade', 'sass', 'script'],
+              'watch', ->
     browserSync
       notify: true
       port: 8182
@@ -127,5 +129,9 @@ gulp.task 'start', ->
   return
 
 gulp.task 'default', ->
-  runSequence 'clean', ['jade', 'sass'], 'lint', 'coffee', 'pkg', ['uglify-file', 'uglify-pkg']
+  runSequence 'clean',
+              ['jade', 'sass'],
+              'lint', 'coffee',
+              'pkg',
+              ['uglify-file', 'uglify-pkg']
   return
