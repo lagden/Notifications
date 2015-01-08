@@ -2,7 +2,7 @@
   "name": "notifications",
   "title": "Notifications",
   "description": "It is a plugin that show notification like Growl",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "author": "Thiago Lagden",
   "keyword": [
     "notification",
@@ -24,6 +24,6 @@
     ".*"
   ],
   "dependencies": {
-    "gsap": "~1.13.2"
+    "gsap": "~1.15.0"
   }
 }
