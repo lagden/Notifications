@@ -12,7 +12,7 @@ TweenMax.js
 
 ((root, factory) ->
   if typeof define is "function" and define.amd
-    define ['greensock/TweenMax'], factory
+    define ['TweenMax'], factory
   else
     root.Notifications = factory(root.TweenMax)
   return

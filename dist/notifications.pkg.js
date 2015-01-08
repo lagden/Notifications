@@ -6909,7 +6909,7 @@ TweenMax.js
  */
 (function(root, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['greensock/TweenMax'], factory);
+    define(['TweenMax'], factory);
   } else {
     root.Notifications = factory(root.TweenMax);
   }
