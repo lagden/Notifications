@@ -11,7 +11,7 @@ It is a plugin that show notification like Growl
   if typeof define is 'function' and define.amd
     define [
         'TweenMax'
-        'Tap'
+        'tap'
       ], factory
   else
     root.Notifications = factory root.TweenMax,

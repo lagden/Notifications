@@ -9,7 +9,7 @@ It is a plugin that show notification like Growl
  */
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
-    define(['TweenMax', 'Tap'], factory);
+    define(['TweenMax', 'tap'], factory);
   } else {
     root.Notifications = factory(root.TweenMax, root.Tap);
   }
