@@ -2,7 +2,7 @@
   "name": "notifications",
   "title": "Notifications",
   "description": "It is a plugin that show notification like Growl",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "author": "Thiago Lagden",
   "keyword": [
     "notification",
@@ -24,6 +24,7 @@
     ".*"
   ],
   "dependencies": {
-    "gsap": "~1.15.0"
+    "gsap": "~1.16.1",
+    "tap.js": "lagden/tap.js#bea960e7974b704e0f8442bece9b1df4729dd6b5"
   }
 }

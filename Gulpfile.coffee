@@ -44,6 +44,7 @@ map =
   pkg:
     src: [
       'dist/lib/gsap/src/uncompressed/TweenMax.js'
+      'dist/lib/tap.js/tap.js'
       'dist/notifications.js'
     ]
     out:  'notifications.pkg.js'

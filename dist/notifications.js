@@ -6,54 +6,22 @@ It is a plugin that show notification like Growl
 
 @author      Thiago Lagden <lagden [at] gmail.com>
 @copyright   Author
-
-Depends:
-TweenMax.js
  */
 (function(root, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(['TweenMax'], factory);
+  if (typeof define === 'function' && define.amd) {
+    define(['TweenMax', 'Tap'], factory);
   } else {
-    root.Notifications = factory(root.TweenMax);
+    root.Notifications = factory(root.TweenMax, root.Tap);
   }
-})(this, function(TM) {
+})(this, function(TM, Tap) {
   'use strict';
-  var Notifications, options, _SPL;
-  if (!window.CustomEvent) {
-    (function() {
-      var CustomEvent;
-      CustomEvent = function(event, params) {
-        var evt;
-        params = params || {
-          bubbles: false,
-          cancelable: false,
-          detail: void 0
-        };
-        evt = document.createEvent("CustomEvent");
-        evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
-        return evt;
-      };
-      CustomEvent.prototype = window.Event.prototype;
-      window.CustomEvent = CustomEvent;
-    })();
-  }
-  _SPL = {
-    getTemplate: function() {
-      return ['<h3 class="theNotification__title">{title}</h3>', '<p class="theNotification__msg">{msg}</p>'].join('');
-    },
-    extend: function(a, b) {
-      var prop;
-      for (prop in b) {
-        a[prop] = b[prop];
-      }
-      return a;
-    },
-    selfRemove: function(item, duration) {
-      setTimeout(function() {
-        item.dispatchEvent(new CustomEvent('click'));
-        item = null;
-      }, duration);
+  var Notifications, extend, options;
+  extend = function(a, b) {
+    var prop;
+    for (prop in b) {
+      a[prop] = b[prop];
     }
+    return a;
   };
   options = {
     duration: 5000,
@@ -65,15 +33,19 @@ TweenMax.js
       if ((this instanceof Notifications) === false) {
         return new Notifications(opts);
       }
-      this.opts = _SPL.extend(options, opts);
+      this.opts = extend(options, opts);
       this.items = [];
       this.events = {};
       this.container = this.opts.container || document.body;
-      this.template = this.opts.template || _SPL.getTemplate();
+      this.template = this.opts.template || this.getTemplate();
     }
 
+    Notifications.prototype.getTemplate = function() {
+      return ['<h3 class="theNotification__title">{title}</h3>', '<p class="theNotification__msg">{msg}</p>'].join('');
+    };
+
     Notifications.prototype.notifica = function(t, m) {
-      var content, item, last, offset, r, randEventName;
+      var content, item, last, offset, r;
       r = {
         title: t,
         msg: m
@@ -91,55 +63,67 @@ TweenMax.js
         offset[0] = parseInt(last.getAttribute('data-offset'), 10);
         offset[1] = parseInt(offset[0] + last.offsetHeight + this.opts.offset, 10);
       }
-      randEventName = 'evt' + String(Math.random() * Date.now()).split('.')[0];
-      this.events[randEventName] = this.remove.bind(this);
       item.setAttribute('data-offset', offset[1]);
-      item.setAttribute('data-event', randEventName);
-      item.addEventListener('click', this.events[randEventName], false);
+      new Tap(item);
+      item.addEventListener('tap', this, false);
       this.items.push(item);
       this.put(item, offset);
       item = null;
     };
 
     Notifications.prototype.put = function(item, offset) {
-      var from, to;
+      var selfRemove;
       this.container.appendChild(item);
-      from = {
+      selfRemove = function(item, duration) {
+        var t;
+        t = setTimeout(function() {
+          item.dispatchEvent(new Event('tap'));
+          item = null;
+          clearTimeout(t);
+        }, duration);
+      };
+      TM.fromTo(item, 0.5, {
         y: offset[0],
         opacity: 0
-      };
-      to = {
+      }, {
         y: offset[1],
         opacity: 1,
-        onComplete: _SPL.selfRemove,
+        onComplete: selfRemove,
         onCompleteParams: [item, this.opts.duration]
-      };
-      TM.fromTo(item, 0.5, from, to);
+      });
       item = null;
     };
 
     Notifications.prototype.remove = function(event) {
-      var item, onCompleteRemove, randEventName, to;
+      var item, onCompleteRemove;
+      event.preventDefault();
       item = event.currentTarget;
-      randEventName = item.getAttribute('data-event');
-      item.removeEventListener('click', this.events[randEventName], false);
-      delete this.events[randEventName];
-      onCompleteRemove = function(item) {
-        var index;
-        index = this.items.indexOf(item);
-        if (index !== -1) {
-          this.container.removeChild(this.items[index]);
-          this.items.splice(index, 1);
-        }
-        item = null;
-      };
-      to = {
+      item.removeEventListener('tap', this, false);
+      onCompleteRemove = (function(_this) {
+        return function(item) {
+          var index;
+          index = _this.items.indexOf(item);
+          if (index !== -1) {
+            _this.container.removeChild(_this.items[index]);
+            _this.items.splice(index, 1);
+          }
+          item = null;
+        };
+      })(this);
+      TM.to(item, 0.3, {
         y: '-=30',
         opacity: 0,
-        onComplete: onCompleteRemove.bind(this, item)
-      };
-      TM.to(item, 0.3, to);
+        onComplete: onCompleteRemove,
+        onCompleteParams: [item]
+      });
       item = null;
+    };
+
+    Notifications.prototype.handleEvent = function(event) {
+      switch (event.type) {
+        case 'tap':
+          this.remove(event);
+      }
     };
 
     return Notifications;

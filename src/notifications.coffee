@@ -5,65 +5,25 @@ It is a plugin that show notification like Growl
 
 @author      Thiago Lagden <lagden [at] gmail.com>
 @copyright   Author
-
-Depends:
-TweenMax.js
 ###
 
 ((root, factory) ->
-  if typeof define is "function" and define.amd
-    define ['TweenMax'], factory
+  if typeof define is 'function' and define.amd
+    define [
+        'TweenMax'
+        'Tap'
+      ], factory
   else
-    root.Notifications = factory(root.TweenMax)
+    root.Notifications = factory root.TweenMax,
+                                 root.Tap
   return
-) @, (TM) ->
+) @, (TM, Tap) ->
 
   'use strict'
 
-  # CustomEvent() constructor functionality in Internet Explorer
-  unless window.CustomEvent
-    (->
-      CustomEvent = (event, params) ->
-        params = params or
-          bubbles: false
-          cancelable: false
-          detail: undefined
-
-        evt = document.createEvent "CustomEvent"
-        evt.initCustomEvent event,
-                            params.bubbles,
-                            params.cancelable,
-                            params.detail
-        return evt
-
-      CustomEvent:: = window.Event::
-      window.CustomEvent = CustomEvent
-      return
-    )()
-
-  # Static Private Library
-  _SPL =
-    getTemplate: () ->
-      [
-        '<h3 class="theNotification__title">{title}</h3>'
-        '<p class="theNotification__msg">{msg}</p>'
-      ].join ''
-
-    extend: (a, b) ->
-      a[ prop ] = b[ prop ] for prop of b
-      return a
-
-    selfRemove: (item, duration) ->
-      setTimeout () ->
-        # Fires the click event
-        item.dispatchEvent(new CustomEvent 'click')
-
-        # Force Garbage Collection
-        item = null
-        return
-
-      , duration
-      return
+  extend = (a, b) ->
+    a[ prop ] = b[ prop ] for prop of b
+    return a
 
   # Default Options
   options =
@@ -75,11 +35,18 @@ TweenMax.js
   class Notifications
     constructor: (opts) ->
       return new Notifications opts if (@ instanceof Notifications) is false
-      @opts = _SPL.extend options, opts
+      @opts = extend options, opts
       @items = []
       @events = {}
       @container = @opts.container or document.body
-      @template = @opts.template or _SPL.getTemplate()
+      @template = @opts.template or @getTemplate()
+
+    # Template
+    getTemplate: ->
+      [
+        '<h3 class="theNotification__title">{title}</h3>'
+        '<p class="theNotification__msg">{msg}</p>'
+      ].join ''
 
     # Build
     notifica: (t, m) ->
@@ -108,16 +75,12 @@ TweenMax.js
         offset[0] = parseInt last.getAttribute('data-offset'), 10
         offset[1] = parseInt (offset[0] + last.offsetHeight + @opts.offset), 10
 
-      # Caching events handlers
-      randEventName = 'evt' + String(Math.random() * Date.now()).split('.')[0]
-      @events[randEventName] = @remove.bind @
-
       # Setting attributes
       item.setAttribute 'data-offset', offset[1]
-      item.setAttribute 'data-event', randEventName
 
       # Listener
-      item.addEventListener 'click', @events[randEventName], false
+      new Tap item
+      item.addEventListener 'tap', @, false
 
       # Keep item
       @items.push item
@@ -133,18 +96,24 @@ TweenMax.js
       # Add to DOM
       @container.appendChild item
 
-      # Animation
-      from =
+      selfRemove = (item, duration) ->
+        t = setTimeout () ->
+          item.dispatchEvent(new Event 'tap')
+          item = null
+          clearTimeout t
+          return
+        , duration
+        return
+
+      TM.fromTo item, 0.5, {
         y: offset[0]
         opacity: 0
-
-      to =
-        y: offset[1],
-        opacity: 1,
-        onComplete: _SPL.selfRemove
+      }, {
+        y: offset[1]
+        opacity: 1
+        onComplete: selfRemove
         onCompleteParams: [item, @opts.duration]
-
-      TM.fromTo item, 0.5, from, to
+      }
 
       # Force Garbage Collection
       item = null
@@ -153,36 +122,37 @@ TweenMax.js
     # Animate and remove item
     remove: (event) ->
 
+      event.preventDefault()
+
       # Getting item
       item = event.currentTarget
 
-      # Getting event handler name and remove listener
-      randEventName = item.getAttribute 'data-event'
-      item.removeEventListener 'click', @events[randEventName], false
-
-      # Remove binding function
-      delete @events[randEventName]
+      # remove event listener
+      item.removeEventListener 'tap', @, false
 
       # Animation
-      onCompleteRemove = (item) ->
+      onCompleteRemove = (item) =>
         index = @items.indexOf item
         if index isnt -1
           @container.removeChild @items[index]
           @items.splice index, 1
-
         # Force Garbage Collection
         item = null
         return
 
-      to =
-        y: '-=30',
-        opacity: 0,
-        onComplete: onCompleteRemove.bind @, item
-
-      TM.to item, 0.3, to
+      TM.to item, 0.3,
+        y: '-=30'
+        opacity: 0
+        onComplete: onCompleteRemove
+        onCompleteParams: [item]
 
       # Force Garbage Collection
       item = null
+      return
+
+    handleEvent: (event) ->
+      switch event.type
+        when 'tap' then @remove event
       return
 
   return Notifications
