@@ -7416,7 +7416,14 @@ It is a plugin that show notification like Growl
       selfRemove = function(item, duration) {
         var t;
         t = setTimeout(function() {
-          item.dispatchEvent(new Event('tap'));
+          var evt;
+          if (window.CustomEvent) {
+            evt = new window.CustomEvent('tap');
+          } else {
+            evt = document.createEvent('Event');
+            evt.initEvent('tap');
+          }
+          item.dispatchEvent(evt);
           item = null;
           clearTimeout(t);
         }, duration);
